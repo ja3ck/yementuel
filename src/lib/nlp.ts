@@ -1,9 +1,41 @@
+import { faissClient } from './faiss-client';
+
 // NLP service for word similarity calculations
 class NLPService {
+  private useExternalService: boolean = true;
+
+  constructor() {
+    // Test connection to FAISS service on startup
+    this.testFAISSConnection();
+  }
+
+  private async testFAISSConnection() {
+    try {
+      const isConnected = await faissClient.testConnection();
+      this.useExternalService = isConnected;
+      console.log(`NLP Service mode: ${this.useExternalService ? 'FAISS' : 'Mock'}`);
+    } catch (error) {
+      console.warn('FAISS service not available, using mock similarity');
+      this.useExternalService = false;
+    }
+  }
+
   async calculateSimilarity(word1: string, word2: string): Promise<number> {
-    // Temporary implementation - returns random similarity
-    // This will be replaced with actual FastText similarity calculation
+    if (this.useExternalService) {
+      try {
+        return await faissClient.calculateSimilarity(word1, word2);
+      } catch (error) {
+        console.warn('FAISS service failed, falling back to mock:', error);
+        this.useExternalService = false;
+        return this.mockSimilarity(word1, word2);
+      }
+    }
     
+    return this.mockSimilarity(word1, word2);
+  }
+
+  private mockSimilarity(word1: string, word2: string): number {
+    // Mock implementation - fallback when FAISS service is unavailable
     if (word1 === word2) {
       return 1.0;
     }
@@ -22,9 +54,41 @@ class NLPService {
     return Math.min(jaccard + randomFactor, 0.99);
   }
 
+  /**
+   * Get current service status
+   */
+  async getServiceStatus() {
+    if (this.useExternalService) {
+      try {
+        const health = await faissClient.checkHealth();
+        return {
+          service: 'FAISS',
+          status: health.status,
+          model_loaded: health.model_loaded,
+          vocab_size: health.vocab_size
+        };
+      } catch {
+        return {
+          service: 'FAISS',
+          status: 'unavailable',
+          model_loaded: false,
+          vocab_size: 0
+        };
+      }
+    }
+    
+    return {
+      service: 'Mock',
+      status: 'active',
+      model_loaded: true,
+      vocab_size: 'N/A'
+    };
+  }
+
   async loadModel(): Promise<void> {
-    // TODO: Load FastText Korean model
-    console.log('NLP Model loading skipped - using mock implementation');
+    // Test FAISS connection
+    await this.testFAISSConnection();
+    console.log(`NLP Service initialized in ${this.useExternalService ? 'FAISS' : 'Mock'} mode`);
   }
 }
 

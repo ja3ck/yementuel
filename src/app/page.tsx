@@ -5,6 +5,7 @@ import Header from '@/components/Header';
 import WordInput from '@/components/WordInput';
 import WordList from '@/components/WordList';
 import GiveUpButton from '@/components/GiveUpButton';
+import { useSession } from '@/hooks/useSession';
 
 interface WordResult {
   word: string;
@@ -20,6 +21,7 @@ interface WordListItem {
 }
 
 export default function Home() {
+  const { sessionId, isLoading: sessionLoading } = useSession();
   const [wordList, setWordList] = useState<WordListItem[]>([]);
   const [isCorrect, setIsCorrect] = useState(false);
   const [currentAnswer, setCurrentAnswer] = useState<string | null>(null);
@@ -27,8 +29,10 @@ export default function Home() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    fetchWordList();
-  }, []);
+    if (!sessionLoading && sessionId) {
+      fetchWordList();
+    }
+  }, [sessionId, sessionLoading]);
 
   const fetchWordList = async () => {
     try {
@@ -86,6 +90,21 @@ export default function Home() {
     setCurrentAnswer(answer);
     setIsCorrect(true);
   };
+
+  // Show loading state while session is being initialized
+  if (sessionLoading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-amber-50 to-orange-50">
+        <Header />
+        <main className="container mx-auto px-4 py-8 max-w-4xl">
+          <div className="bg-white rounded-2xl shadow-lg p-8 text-center">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-500 mx-auto"></div>
+            <p className="mt-4 text-gray-600">세션 준비 중...</p>
+          </div>
+        </main>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-amber-50 to-orange-50">

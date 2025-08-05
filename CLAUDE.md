@@ -130,3 +130,9 @@ This Next.js implementation provides several advantages over the previous Expres
 - Database auto-initializes on first run
 - Admin dashboard allows adding daily words with specific dates
 - CAPTCHA required for answer reveal (포기하기 feature)
+
+## User Experience Improvements
+- **Anonymous User Tracking**: 로그인하지 않은 사용자라도 쿠키나 세션 정보를 통해서 시도한 단어들을 분리해서 보여주세요
+
+## Similarity Calculation
+- 단어 유사도 계산은 FAISS 를 사용해주세요 

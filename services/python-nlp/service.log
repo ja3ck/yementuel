@@ -1,0 +1,24 @@
+INFO:     Started server process [79850]
+INFO:     Waiting for application startup.
+INFO:__main__:Starting Korean NLP service...
+INFO:__main__:Loading Korean word vectors...
+INFO:__main__:Loaded 69 Korean word vectors
+INFO:__main__:Korean NLP service ready!
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+INFO:     127.0.0.1:53916 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53936 - "POST /similarity HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53940 - "POST /similarity HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53942 - "POST /similarity HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53945 - "POST /similarity HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54187 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54188 - "POST /similarity HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54213 - "POST /similarity HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54294 - "POST /similarity HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54294 - "POST /similarity HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54313 - "POST /similarity HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54319 - "POST /similarity HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54322 - "POST /similarity HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54325 - "POST /similarity HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54328 - "POST /similarity HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54331 - "POST /similarity HTTP/1.1" 200 OK

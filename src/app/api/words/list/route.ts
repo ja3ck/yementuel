@@ -1,9 +1,15 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { wordService } from '../../../../lib/wordService';
+import { getSessionIdFromCookies } from '../../../../lib/session';
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
-    const wordList = await wordService.getTodayWordList();
+    // Get session ID from cookies
+    const cookieHeader = request.headers.get('cookie');
+    const sessionId = getSessionIdFromCookies(cookieHeader || undefined);
+    
+    // Get word list filtered by session ID (if available)
+    const wordList = await wordService.getTodayWordList(sessionId || undefined);
     
     return NextResponse.json({
       success: true,

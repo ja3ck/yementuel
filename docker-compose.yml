@@ -1,0 +1,44 @@
+version: '3.8'
+
+services:
+  # Python NLP Service
+  nlp-service:
+    build: ./services/python-nlp
+    container_name: yementuel-nlp
+    ports:
+      - "8000:8000"
+    environment:
+      - PYTHONUNBUFFERED=1
+    volumes:
+      # Mount for Korean FastText model if available
+      - ./models:/app/models:ro
+    healthcheck:
+      test: ["CMD", "python", "-c", "import requests; requests.get('http://localhost:8000/health')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    restart: unless-stopped
+
+  # Next.js Application
+  web:
+    build: .
+    container_name: yementuel-web
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - NLP_SERVICE_URL=http://nlp-service:8000
+    depends_on:
+      nlp-service:
+        condition: service_healthy
+    volumes:
+      - ./data:/app/data
+      - ./models:/app/models:ro
+    restart: unless-stopped
+
+volumes:
+  data:
+    driver: local
+  models:
+    driver: local

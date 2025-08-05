@@ -15,7 +15,7 @@ export interface WordListItem {
 }
 
 class WordService {
-  async checkWordSimilarity(word: string): Promise<WordCheckResult> {
+  async checkWordSimilarity(word: string, sessionId: string): Promise<WordCheckResult> {
     const today = new Date().toISOString().split('T')[0];
     const dailyWord = queries.getDailyWord(today);
     
@@ -30,11 +30,11 @@ class WordService {
     
     const isCorrect = word === currentAnswer;
     
-    // Save attempt to database
-    queries.addWordAttempt(word, similarity, today);
+    // Save attempt to database with session ID
+    queries.addWordAttempt(word, similarity, today, sessionId);
     
-    // Get updated list and find rank
-    const attempts = queries.getTodayAttempts(today);
+    // Get updated list for this session and find rank
+    const attempts = queries.getTodayAttemptsBySession(today, sessionId);
     const rank = attempts.findIndex(item => item.word === word) + 1;
     
     return {
@@ -45,9 +45,13 @@ class WordService {
     };
   }
 
-  async getTodayWordList(): Promise<WordListItem[]> {
+  async getTodayWordList(sessionId?: string): Promise<WordListItem[]> {
     const today = new Date().toISOString().split('T')[0];
-    const attempts = queries.getTodayAttempts(today);
+    
+    // If sessionId is provided, get session-specific attempts, otherwise get all
+    const attempts = sessionId 
+      ? queries.getTodayAttemptsBySession(today, sessionId)
+      : queries.getTodayAttempts(today);
     
     return attempts.map(item => ({
       word: item.word,

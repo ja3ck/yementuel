@@ -34,9 +34,17 @@ export const initDatabase = () => {
       word TEXT NOT NULL,
       similarity REAL NOT NULL,
       date TEXT NOT NULL,
+      session_id TEXT NOT NULL,
       created_at TEXT DEFAULT CURRENT_TIMESTAMP
     )
   `);
+
+  // Add session_id column if it doesn't exist (migration)
+  try {
+    db.exec(`ALTER TABLE word_attempts ADD COLUMN session_id TEXT DEFAULT 'anonymous'`);
+  } catch (error) {
+    // Column already exists, ignore error
+  }
 
   // Admin users table
   db.exec(`
@@ -90,11 +98,11 @@ export const queries = {
   },
 
   // Word attempts
-  addWordAttempt: (word: string, similarity: number, date: string) => {
+  addWordAttempt: (word: string, similarity: number, date: string, sessionId: string) => {
     return db.prepare(`
-      INSERT INTO word_attempts (word, similarity, date)
-      VALUES (?, ?, ?)
-    `).run(word, similarity, date);
+      INSERT INTO word_attempts (word, similarity, date, session_id)
+      VALUES (?, ?, ?, ?)
+    `).run(word, similarity, date, sessionId);
   },
 
   getTodayAttempts: (date: string) => {
@@ -104,6 +112,15 @@ export const queries = {
       WHERE date = ?
       ORDER BY similarity DESC
     `).all(date) as Array<{ word: string; similarity: number; timestamp: string }>;
+  },
+
+  getTodayAttemptsBySession: (date: string, sessionId: string) => {
+    return db.prepare(`
+      SELECT word, similarity, created_at as timestamp
+      FROM word_attempts
+      WHERE date = ? AND session_id = ?
+      ORDER BY similarity DESC
+    `).all(date, sessionId) as Array<{ word: string; similarity: number; timestamp: string }>;
   },
 
   // Admin

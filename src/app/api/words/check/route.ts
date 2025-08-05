@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { wordService } from '../../../../lib/wordService';
+import { getSessionIdFromCookies, generateSessionId, formatSetCookieHeader } from '../../../../lib/session';
 
 export async function POST(request: NextRequest) {
   try {
@@ -12,12 +13,29 @@ export async function POST(request: NextRequest) {
       }, { status: 400 });
     }
 
-    const result = await wordService.checkWordSimilarity(word);
+    // Get or create session ID
+    const cookieHeader = request.headers.get('cookie');
+    let sessionId = getSessionIdFromCookies(cookieHeader || undefined);
+    let shouldSetCookie = false;
+
+    if (!sessionId) {
+      sessionId = generateSessionId();
+      shouldSetCookie = true;
+    }
+
+    const result = await wordService.checkWordSimilarity(word, sessionId);
     
-    return NextResponse.json({
+    const response = NextResponse.json({
       success: true,
       data: result,
     });
+
+    // Set session cookie if new session
+    if (shouldSetCookie) {
+      response.headers.set('Set-Cookie', formatSetCookieHeader(sessionId));
+    }
+
+    return response;
   } catch (error) {
     console.error('Failed to check word:', error);
     return NextResponse.json({
