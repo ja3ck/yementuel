@@ -76,15 +76,15 @@ src/
 
 ### Admin Endpoints (Authenticated)
 - `POST /api/admin/login` - Admin login
-- `GET /api/admin/daily-word` - Get current daily word
-- `PUT /api/admin/daily-word` - Set new daily word
+- `GET /api/admin/daily-word` - Get all daily words list
+- `POST /api/admin/daily-word` - Add new daily word
 
 ## Database Schema
 
 ### Tables
-- `daily_words`: Stores daily target words
+- `daily_words`: Stores daily target words with dates
 - `word_attempts`: Records all user attempts with similarity scores
-- `admin_users`: Admin user credentials (default: admin/admin123)
+- `admin_users`: Admin user credentials (email-based authentication)
 
 ## Current Status
 
@@ -92,15 +92,17 @@ src/
 - Next.js project with TypeScript and Tailwind CSS
 - SQLite database integration with automatic initialization
 - Word guessing game with similarity scoring
-- Custom canvas-based CAPTCHA system
+- Custom canvas-based CAPTCHA system (dual-button layout)
 - Responsive UI with loading states and error handling
-- Admin authentication system
-- RESTful API routes
+- Complete admin authentication system with email-based login
+- Admin dashboard with daily word management
+- RESTful API routes for both game and admin functionality
+- Database file exclusion in .gitignore
+- Clean project structure (removed old Express+React implementation)
 
 ### ⚠️ Pending Tasks
 - Real Korean word similarity using FastText model
-- Admin dashboard UI
-- Daily word auto-rotation
+- Daily word auto-rotation logic
 - Performance optimizations
 
 ## Migration Benefits
@@ -113,7 +115,18 @@ This Next.js implementation provides several advantages over the previous Expres
 4. **Easy Deployment**: Simple deployment to Vercel/Netlify
 5. **Better DX**: Hot reloading, TypeScript support, and modern tooling
 
-## Default Credentials
-- Admin username: `admin`
-- Admin password: `admin123`
-- Default daily word: `사과`
+## Admin Access
+- **Login URL**: `http://localhost:3001/admin`
+- **Email**: `admin@yementuel.com`
+- **Password**: `admin123`
+- **Dashboard**: `http://localhost:3001/admin/dashboard`
+
+## Game Access
+- **Main Game**: `http://localhost:3001/`
+- **Default Daily Word**: `사과`
+
+## Development Notes
+- Server runs on port 3001 (when 3000 is occupied)
+- Database auto-initializes on first run
+- Admin dashboard allows adding daily words with specific dates
+- CAPTCHA required for answer reveal (포기하기 feature)
