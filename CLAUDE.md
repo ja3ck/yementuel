@@ -4,102 +4,116 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-Yementuel (예맨틀) is a Korean word-guessing web application where users try to guess a daily target word. The app calculates and displays cosine similarity between user guesses and the target word, providing a ranked list of guesses to help users find the answer.
+Yementuel (예맨틀) is a Korean word-guessing web application built with Next.js. Users try to guess a daily target word by receiving cosine similarity scores for their attempts. The app provides a ranked list of guesses to help users find the answer.
 
-## Key Requirements
+## Key Features
 
-### Core Features
+### Core Functionality
 - **Word Guessing Game**: Users input Korean words (2+ characters) to guess the daily target
 - **Cosine Similarity**: Calculate and display similarity scores between guesses and target word
 - **Leaderboard**: Show user guesses ranked by similarity score
 - **Daily Word**: One target word per day, changeable through admin dashboard
-- **Responsive Design**: Must work seamlessly on both PC and mobile devices
-- **Captcha Hint Feature**: 사용자가 포기하고 정답을 맞추길 원하면 Capcha 를 풀고 버튼을 누르면 정답을 제공해야합니다.
+- **Responsive Design**: Works seamlessly on both PC and mobile devices
+- **CAPTCHA Protection**: Custom canvas-based CAPTCHA for answer reveal
 
-### Authentication
-- Admin authentication required for dashboard access
-- Regular users play without authentication
-
-### Technical Considerations
-- Korean language support is essential
-- Word embeddings or similar NLP model needed for cosine similarity calculations
-- Consider using Korean word vectors (e.g., FastText Korean, Word2Vec Korean models)
-- Database needed to store daily words and possibly user guesses
+### Architecture
+- **Framework**: Next.js 15 with App Router and TypeScript
+- **Styling**: Tailwind CSS with cozy design (warm colors, rounded corners)
+- **Database**: SQLite with better-sqlite3 for persistent storage
+- **Authentication**: JWT-based admin authentication
+- **API Routes**: RESTful API integrated within Next.js
 
 ## Development Commands
 
 ### Setup
 ```bash
-# Install root dependencies
 npm install
-
-# Install server dependencies
-cd server && npm install
-
-# Install client dependencies
-cd client && npm install
 ```
 
 ### Development
 ```bash
-# Run both frontend and backend in development mode
-npm run dev
-
-# Run only server
-npm run server:dev
-
-# Run only client  
-npm run client:dev
-```
-
-### Build
-```bash
-# Build both frontend and backend
-npm run build
-
-# Build only server
-npm run server:build
-
-# Build only client
-npm run client:build
+npm run dev          # Start development server with Turbopack
+npm run build        # Build for production
+npm run start        # Start production server
+npm run lint         # Run ESLint
 ```
 
 ### Environment Variables
-- Server: Copy `server/.env.example` to `server/.env` and update values
-- Client: Copy `client/.env.example` to `client/.env` and update values
+- Copy `.env.local.example` to `.env.local` and update values
+- `JWT_SECRET`: Secret key for JWT token signing
+- `NODE_ENV`: Environment (development/production)
 
-## Architecture Guidelines
+## Project Structure
 
-### Current Implementation
-- **Frontend**: React with TypeScript and Tailwind CSS
-  - Components: Header, WordInput, WordList, GiveUpButton
-  - Simple and cozy design with warm colors
-  - CAPTCHA integration for answer reveal
-  
-- **Backend**: Express.js with TypeScript
-  - Routes: `/api/words` (game logic), `/api/admin` (admin features)
-  - Services: wordService, adminService, nlpService
-  - JWT authentication for admin
-  
-- **NLP Service**: Currently using mock implementation
-  - TODO: Integrate FastText Korean pre-trained model
-  - Cosine similarity calculation between word vectors
-  
-- **Data Storage**: SQLite database for persistent storage
-  - Tables: daily_words, word_attempts, admin_users
-  - Automatic database initialization on startup
+```
+src/
+├── app/
+│   ├── api/
+│   │   ├── words/          # Game API endpoints
+│   │   └── admin/          # Admin API endpoints
+│   ├── globals.css         # Global styles
+│   ├── layout.tsx          # Root layout
+│   └── page.tsx            # Main game page
+├── components/
+│   ├── Header.tsx          # App header
+│   ├── WordInput.tsx       # Word input form
+│   ├── WordList.tsx        # List of attempted words
+│   ├── GiveUpButton.tsx    # Answer reveal with CAPTCHA
+│   └── SimpleCaptcha.tsx   # Custom CAPTCHA component
+└── lib/
+    ├── database.ts         # SQLite database setup and queries
+    ├── wordService.ts      # Word game logic
+    ├── adminService.ts     # Admin authentication
+    └── nlp.ts             # NLP similarity calculations (mock)
+```
 
-### Next Steps
-1. Integrate FastText Korean model for real similarity calculations
-2. Implement admin dashboard UI
-3. Add daily word rotation logic
-4. Deploy with Docker
+## API Endpoints
 
-### Current Status
-- ✅ Basic game functionality implemented
-- ✅ SQLite database integration
-- ✅ Custom CAPTCHA for answer reveal
-- ✅ Responsive design with Tailwind CSS
-- ⚠️ Using mock similarity calculations (needs FastText integration)
-- ❌ Admin dashboard UI not implemented
-- ❌ Daily word auto-rotation not implemented
+### Public Endpoints
+- `POST /api/words/check` - Check word similarity
+- `GET /api/words/list` - Get today's word attempts
+- `POST /api/words/reveal-answer` - Reveal answer (with CAPTCHA)
+
+### Admin Endpoints (Authenticated)
+- `POST /api/admin/login` - Admin login
+- `GET /api/admin/daily-word` - Get current daily word
+- `PUT /api/admin/daily-word` - Set new daily word
+
+## Database Schema
+
+### Tables
+- `daily_words`: Stores daily target words
+- `word_attempts`: Records all user attempts with similarity scores
+- `admin_users`: Admin user credentials (default: admin/admin123)
+
+## Current Status
+
+### ✅ Completed Features
+- Next.js project with TypeScript and Tailwind CSS
+- SQLite database integration with automatic initialization
+- Word guessing game with similarity scoring
+- Custom canvas-based CAPTCHA system
+- Responsive UI with loading states and error handling
+- Admin authentication system
+- RESTful API routes
+
+### ⚠️ Pending Tasks
+- Real Korean word similarity using FastText model
+- Admin dashboard UI
+- Daily word auto-rotation
+- Performance optimizations
+
+## Migration Benefits
+
+This Next.js implementation provides several advantages over the previous Express + React setup:
+
+1. **Unified Development**: Single `npm run dev` command
+2. **Built-in API**: No separate server needed
+3. **Optimized Build**: Automatic code splitting and optimization
+4. **Easy Deployment**: Simple deployment to Vercel/Netlify
+5. **Better DX**: Hot reloading, TypeScript support, and modern tooling
+
+## Default Credentials
+- Admin username: `admin`
+- Admin password: `admin123`
+- Default daily word: `사과`
