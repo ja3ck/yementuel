@@ -42,7 +42,7 @@ export const initDatabase = () => {
   db.exec(`
     CREATE TABLE IF NOT EXISTS admin_users (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
-      username TEXT NOT NULL UNIQUE,
+      email TEXT NOT NULL UNIQUE,
       password_hash TEXT NOT NULL,
       created_at TEXT DEFAULT CURRENT_TIMESTAMP
     )
@@ -53,9 +53,9 @@ export const initDatabase = () => {
   if (adminExists.count === 0) {
     // Password: 'admin123' (hashed)
     db.prepare(`
-      INSERT INTO admin_users (username, password_hash)
+      INSERT INTO admin_users (email, password_hash)
       VALUES (?, ?)
-    `).run('admin', '$2b$10$xGxN1rSVqCzFJ7fDgE0b8OQ8M9NXm2JEYtQGJxZK2xqK.xvF0oJZe');
+    `).run('admin@yementuel.com', '$2b$10$6jeoxsyHV.xSoOa8hImBN.mnAHyygZ8k0r98J1ICL4e3/1aFVcKoS');
   }
 
   // Insert default word for today if not exists
@@ -81,6 +81,14 @@ export const queries = {
     `).run(word, date);
   },
 
+  getAllDailyWords: () => {
+    return db.prepare(`
+      SELECT id, word, date, created_at
+      FROM daily_words
+      ORDER BY date DESC
+    `).all() as Array<{ id: number; word: string; date: string; created_at: string }>;
+  },
+
   // Word attempts
   addWordAttempt: (word: string, similarity: number, date: string) => {
     return db.prepare(`
@@ -99,10 +107,10 @@ export const queries = {
   },
 
   // Admin
-  getAdminUser: (username: string) => {
-    return db.prepare('SELECT * FROM admin_users WHERE username = ?').get(username) as {
+  getAdminUser: (email: string) => {
+    return db.prepare('SELECT * FROM admin_users WHERE email = ?').get(email) as {
       id: number;
-      username: string;
+      email: string;
       password_hash: string;
     } | undefined;
   },

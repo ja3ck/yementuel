@@ -7,6 +7,8 @@ interface GiveUpButtonProps {
 
 const GiveUpButton: React.FC<GiveUpButtonProps> = ({ onGiveUp }) => {
   const [showCaptcha, setShowCaptcha] = useState(false);
+  const [userInput, setUserInput] = useState('');
+  const [captchaText, setCaptchaText] = useState('');
 
   const handleCaptchaValidate = async (isValid: boolean) => {
     if (isValid) {
@@ -24,6 +26,14 @@ const GiveUpButton: React.FC<GiveUpButtonProps> = ({ onGiveUp }) => {
       } catch (error) {
         console.error('Failed to get answer:', error);
       }
+    }
+  };
+
+  const handleGiveUpSubmit = () => {
+    if (userInput.toLowerCase() === captchaText.toLowerCase()) {
+      handleCaptchaValidate(true);
+    } else {
+      // 캡차가 틀렸을 때는 SimpleCaptcha 컴포넌트에서 처리
     }
   };
 
@@ -55,6 +65,17 @@ const GiveUpButton: React.FC<GiveUpButtonProps> = ({ onGiveUp }) => {
           className="flex-1 py-2 px-4 bg-gray-200 text-gray-800 font-semibold rounded-lg hover:bg-gray-300 transition-colors"
         >
           취소
+        </button>
+        <button
+          onClick={() => {
+            const input = document.querySelector('input[placeholder="위 문자를 입력하세요"]') as HTMLInputElement;
+            if (input?.value) {
+              input.dispatchEvent(new KeyboardEvent('keypress', { key: 'Enter', bubbles: true }));
+            }
+          }}
+          className="flex-1 py-2 px-4 bg-red-500 text-white font-semibold rounded-lg hover:bg-red-600 transition-colors"
+        >
+          포기하기
         </button>
       </div>
     </div>

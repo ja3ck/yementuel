@@ -2,9 +2,10 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 
 interface SimpleCaptchaProps {
   onValidate: (isValid: boolean) => void;
+  onSubmit?: () => void;
 }
 
-const SimpleCaptcha: React.FC<SimpleCaptchaProps> = ({ onValidate }) => {
+const SimpleCaptcha: React.FC<SimpleCaptchaProps> = ({ onValidate, onSubmit }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [captchaText, setCaptchaText] = useState('');
   const [userInput, setUserInput] = useState('');
@@ -91,6 +92,14 @@ const SimpleCaptcha: React.FC<SimpleCaptchaProps> = ({ onValidate }) => {
     }
   };
 
+  const handleExternalSubmit = () => {
+    if (onSubmit) {
+      onSubmit();
+    } else {
+      handleSubmit();
+    }
+  };
+
   return (
     <div className="space-y-4">
       <div className="flex justify-center">
@@ -122,6 +131,7 @@ const SimpleCaptcha: React.FC<SimpleCaptchaProps> = ({ onValidate }) => {
       {error && (
         <p className="text-sm text-red-600">{error}</p>
       )}
+
     </div>
   );
 };

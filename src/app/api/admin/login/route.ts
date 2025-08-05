@@ -3,16 +3,16 @@ import { adminService } from '../../../../lib/adminService';
 
 export async function POST(request: NextRequest) {
   try {
-    const { username, password } = await request.json();
+    const { email, password } = await request.json();
 
-    if (!username || !password) {
+    if (!email || !password) {
       return NextResponse.json({
         success: false,
-        error: '사용자명과 비밀번호를 입력해주세요.',
+        error: '이메일과 비밀번호를 입력해주세요.',
       }, { status: 400 });
     }
 
-    const result = await adminService.login(username, password);
+    const result = await adminService.login(email, password);
     
     if (!result) {
       return NextResponse.json({

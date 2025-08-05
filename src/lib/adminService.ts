@@ -4,12 +4,12 @@ import { queries } from './database';
 
 export interface LoginResult {
   token: string;
-  username: string;
+  email: string;
 }
 
 class AdminService {
-  async login(username: string, password: string): Promise<LoginResult | null> {
-    const adminUser = queries.getAdminUser(username);
+  async login(email: string, password: string): Promise<LoginResult | null> {
+    const adminUser = queries.getAdminUser(email);
     
     if (!adminUser) {
       return null;
@@ -22,14 +22,14 @@ class AdminService {
     }
 
     const token = jwt.sign(
-      { id: adminUser.id, username: adminUser.username },
+      { id: adminUser.id, email: adminUser.email },
       process.env.JWT_SECRET || 'secret',
       { expiresIn: '24h' }
     );
 
     return {
       token,
-      username: adminUser.username,
+      email: adminUser.email,
     };
   }
 
@@ -50,6 +50,26 @@ class AdminService {
     return {
       success: true,
       word,
+    };
+  }
+
+  async getAllDailyWords(): Promise<Array<{ id: number; word: string; date: string; isActive: boolean }>> {
+    const today = new Date().toISOString().split('T')[0];
+    const words = queries.getAllDailyWords();
+    
+    return words.map(word => ({
+      ...word,
+      isActive: word.date === today
+    }));
+  }
+
+  async addDailyWord(word: string, date: string): Promise<{ success: boolean; word: string; date: string }> {
+    queries.setDailyWord(word, date);
+    
+    return {
+      success: true,
+      word,
+      date,
     };
   }
 }
